@@ -59,3 +59,7 @@ while run:
     
     pygame.display.flip()
 pygame.quit()
+
+
+#Lass mich nochmal probieren
+#Kann ich nicht löschen
