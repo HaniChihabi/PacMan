@@ -4,7 +4,7 @@ import math
 
 pygame.init()
 
-WIDTH = 900
+WIDTH = 900 
 HEIGHT = 950
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
 timer = pygame.time.Clock()
@@ -16,8 +16,8 @@ PI = math.pi
 player_images = []
 for i in range(1, 5):
     player_images.append(pygame.transform.scale(pygame.image.load(f'assets/player_images/{i}.png'), (45, 45)))
-player_x = 370
-player_y = 540
+player_x = 450
+player_y = 663
 direction = 0
 counter = 0
 flicker = False
@@ -40,7 +40,7 @@ def draw_board():
                                 (j * num2 + (0.5 * num2), i * num1 + num1), 3)
            if level[i][j] == 4:
                pygame.draw.line(screen, color, (j * num2, i * num1 + (0.5 * num1)),
-                                (j * num2 + num2, i * num1 + + (0.5 * num1)), 3)
+                                (j * num2 + num2, i * num1 + (0.5 * num1)), 3)
                
            if level[i][j] == 5:
                pygame.draw.arc(screen, color, [(j*num2 - (num2 * 0.4) - 2), (i * num1 + (0.5 * num1)), num2, num1], 0, PI/2, 3) 
@@ -58,7 +58,7 @@ def draw_board():
            
            if level[i][j] == 9:
                pygame.draw.line(screen, 'white', (j * num2, i * num1 + (0.5 * num1)),
-                                (j * num2 + num2, i * num1 + + (0.5 * num1)), 3)
+                                (j * num2 + num2, i * num1 + (0.5 * num1)), 3)
                
 def draw_player():
     # 0-RIGHT, 1-LEFT, 2-UP, 3-DOWN
@@ -109,12 +109,10 @@ def check_position(centerx, centery):
                 if level[(centery - num1) // num1][centerx // num2] < 3:
                     turns[2] = True
             if 12 <= centery % num1 <= 18:
-                if level[centery // num1][centerx - num3 // num2] < 3:
+                if level[centery // num1][(centerx - num3) // num2] < 3:
                     turns[1] = True
-                if level[centery // num1][centerx + num3 // num2] < 3:
+                if level[centery // num1][(centerx + num3) // num2] < 3:
                     turns[0] = True
-                
-
     else:
         turns[0] = True
         turns[1] = True
@@ -141,7 +139,6 @@ while run:
         counter += 1
         if counter > 3:
             flicker = False
-        
     else:
         counter = 0
         flicker = True
@@ -152,7 +149,7 @@ while run:
     center_x = player_x + 23
     center_y = player_y + 24
     turns_allowed = check_position(center_x, center_y)
-    pygame.draw.circle(screen,'white', (center_x, center_y), 2)
+    player_circle = pygame.draw.circle(screen,'white', (center_x, center_y), 2)
     player_x, player_y = move_player(player_x, player_y)
 
     for event in pygame.event.get():
@@ -178,10 +175,16 @@ while run:
                direction_command = direction
            if event.key == pygame.K_DOWN and direction_command == 3:
                direction_command = direction
+
+    if direction_command == 0 and turns_allowed[0]:
+        direction = 0
+    if direction_command == 1 and turns_allowed[1]:
+        direction = 1
+    if direction_command == 2 and turns_allowed[2]:
+        direction = 2
+    if direction_command == 3 and turns_allowed[3]:
+        direction = 3
     
-    for i in range(4):
-       if direction_command == i and turns_allowed[i]:
-           direction = i
 
     if player_x > 900:
         player_x = -47
