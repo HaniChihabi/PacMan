@@ -25,16 +25,13 @@ counter = 0
 flicker = False
 # R, L, U, D
 turns_allowed = [False, False, False, False]
-direction_command = 0 #man 1
+direction_command = 0
 player_speed = 3
 score = 0
 go_text = special_font.render(f"Game Over", True, (255, 255, 255))
 go_text_width, go_text_height = go_text.get_size()
 x_position = (WIDTH - go_text_width) // 2
 y_position = (HEIGHT - go_text_height) // 2
-
-
-
 
 def check_collisions(scor):
    
@@ -100,13 +97,13 @@ def draw_board():
 def draw_player():
     # 0-RIGHT, 1-LEFT, 2-UP, 3-DOWN
     if direction == 0:
-        screen.blit(player_images[counter // 6], (player_x, player_y))
+        screen.blit(player_images[counter // 60], (player_x, player_y))
     elif direction == 1:
-        screen.blit(pygame.transform.flip(player_images[counter // 6], True, False), (player_x, player_y))
+        screen.blit(pygame.transform.flip(player_images[counter // 60], True, False), (player_x, player_y))
     elif direction == 2:
-        screen.blit(pygame.transform.rotate(player_images[counter // 6], 90), (player_x, player_y))
+        screen.blit(pygame.transform.rotate(player_images[counter // 60], 90), (player_x, player_y))
     elif direction == 3:
-        screen.blit(pygame.transform.rotate(player_images[counter // 6], 270), (player_x, player_y))
+        screen.blit(pygame.transform.rotate(player_images[counter // 60], 270), (player_x, player_y))
 
 def check_position(centerx, centery):
     turns = [False, False, False, False]
@@ -172,9 +169,9 @@ def move_player(play_x, play_y):
 run = True
 while run:
     timer.tick(fps)
-    if counter < 19:
+    if counter < 239:
         counter += 1
-        if counter > 3:
+        if counter > 10:
             flicker = False
     else:
         counter = 0
