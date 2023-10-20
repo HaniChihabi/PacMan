@@ -4,45 +4,67 @@ import math
 
 pygame.init()
 
-#ii‚i
+# Screen
 WIDTH = 900 
 HEIGHT = 950
 screen = pygame.display.set_mode([WIDTH, HEIGHT])
-timer = pygame.time.Clock()
-fps = 60
-font = pygame.font.Font('freesansbold.ttf', 20)
-special_font = pygame.font.Font(None, 100)
 level = boards
 color = 'blue'
+
+# Timer
+timer = pygame.time.Clock()
+fps = 60
+
+# Font
+font = pygame.font.Font('freesansbold.ttf', 20)
+special_font = pygame.font.Font(None, 100)
 PI = math.pi
-player_images = []
+
+# Images
+
+player_images = [] # Player Images
 for i in range(1, 5):
     player_images.append(pygame.transform.scale(pygame.image.load(f'assets/player_images/{i}.png'), (45, 45)))
+numbers = [] and True
+counter = 0
+
+for i in range(1, 4): # Countdown Images
+    numbers.append(pygame.transform.scale(pygame.image.load(f'assets/count_down/{i}.png'), (30, 30)))
+numbers_counter = 0
+numbers_displayed = 0
+
+# Player Information
 player_x = 450
 player_y = 663
 direction = 0
-counter = 0
-flicker = False
-# R, L, U, D
-turns_allowed = [False, False, False, False]
+turns_allowed = [False, False, False, False] # R, L, U, D
 direction_command = 0
 player_speed = 3
+lives = 3
+moving = True
+
+
+flicker = False
 score = 0
 powerup = False
 power_counter = 0
 eaten_ghost = [False, False, False, False]
 startup_counter = 0
-moving = True
-lives = 3
+
+
+def draw_countdown():
+    if numbers:
+        screen.blit(numbers[numbers_counter // 60], (440, 915))
 
 def draw_misc():
+    # Blitting Information in at the bottom of the screen
     score_text = font.render(f"Score: {score}", True, 'white')
 
     # Blitting score_text on bottom
     screen.blit(score_text, (10, 920))
 
     # Blitting score_text at the end on the middle
-    if score > 50:
+    if score > 2620:
         bigger_score_text = pygame.font.SysFont(None, 60) 
         bigger_score_text = bigger_score_text.render(f"Score: {score}", True, 'white')
         screen.blit(bigger_score_text, (360, 500))
@@ -54,57 +76,72 @@ def draw_misc():
     for i in range(lives):
         screen.blit(pygame.transform.scale(player_images[0], (30, 30)), (650 + i * 40, 915))
 
-
-
 def check_collisions(scor, power, power_count, eaten_ghosts):
    
     num1 = (HEIGHT - 50) // 32
     num2 = WIDTH//30
     if 0 < player_x < 870:
+
+        # Adding 10 Points for each normal sized dot eaten
         if level[center_y//num1][center_x // num2] == 1:
             level[center_y//num1][center_x // num2] = 0
             scor += 10
-            
+        
+        # Adding 50 Points for each big sized dot eaten
         if level[center_y//num1][center_x // num2] == 2:
             level[center_y//num1][center_x // num2] = 0
             scor += 50        
+
             power = True
             power_count = 0
             eaten_ghosts = [False, False, False, False]
 
     return scor, power, power_count, eaten_ghosts
-
+    
 
 def draw_board():
    num1 = ((HEIGHT - 50) // 32)
    num2 = (WIDTH // 30)
    for i in range(len(level)):
-       for j in range(len(level[i])):    
+       for j in range(len(level[i])):  
+
+           # Normal sized dot  
            if level[i][j] == 1:
                pygame.draw.circle(screen, 'white', (j * num2 + (0.5*num2), i * num1 + (0.5*num1)), 4)
+            
+            # Big sized dot
            if level[i][j] == 2 and not flicker:
                pygame.draw.circle(screen, 'white', (j * num2 + (0.5*num2), i * num1 + (0.5*num1)), 10)
+
+            # Vertical Border line
            if level[i][j] == 3:
                pygame.draw.line(screen, color, (j * num2 + (0.5 * num2), i * num1),
                                 (j * num2 + (0.5 * num2), i * num1 + num1), 3)
+               
+            # Horizontal Border line
            if level[i][j] == 4:
                pygame.draw.line(screen, color, (j * num2, i * num1 + (0.5 * num1)),
                                 (j * num2 + num2, i * num1 + (0.5 * num1)), 3)
                
+            # Arc: 0, PI/2 
            if level[i][j] == 5:
                pygame.draw.arc(screen, color, [(j*num2 - (num2 * 0.4) - 2), (i * num1 + (0.5 * num1)), num2, num1], 0, PI/2, 3) 
             
+            # Arc: PI/2, PI 
            if level[i][j] == 6:
                pygame.draw.arc(screen, color,
                                 [(j*num2 + (num2 * 0.5)), (i * num1 + (0.5 * num1)), num2, num1], PI/2, PI, 3) 
-           
+            
+            # Arc: PI, 3*PI/2
            if level[i][j] == 7:
                pygame.draw.arc(screen, color, [(j*num2 + (num2 * 0.5)), (i * num1 - (0.4 * num1)), num2, num1], PI, 3*PI/2, 3) 
             
+            # Arc: 2, 2*PI/2
            if level[i][j] == 8:
                pygame.draw.arc(screen, color,
                                 [(j*num2 - (num2 * 0.4)) -2, (i * num1 - (0.4 * num1)), num2, num1], 3*PI / 2, 2*PI, 3) 
-           
+            
+            # White Horizontal line
            if level[i][j] == 9:
                pygame.draw.line(screen, 'white', (j * num2, i * num1 + (0.5 * num1)),
                                 (j * num2 + num2, i * num1 + (0.5 * num1)), 3)
@@ -123,9 +160,10 @@ def draw_player():
 
 def check_position(centerx, centery):
     turns = [False, False, False, False]
-    num1 = (HEIGHT - 50) // 32
-    num2 = (WIDTH // 30)
-    num3 = 15
+    num1 = (HEIGHT - 50) // 32    # Height of each tile
+    num2 = (WIDTH // 30)    # Width of each tile
+    num3 = 15    # Fudge number
+
     # check collisions based on center x and center y of player +/- fudge number 
     if centerx // 30 < 29:
         if direction == 0:
@@ -200,17 +238,26 @@ while run:
         power_counter = 0
         powerup = False
         eaten_ghost = [False, False, False, False]
+
+    # Start-up Counter
     if startup_counter < 180:
         startup_counter += 1
         moving = False
     else:
         moving = True
-
+        
+    # Countdown
+    if numbers_counter < 179:
+        numbers_counter += 1
+    else:
+        numbers = False
+         
+    # Functions
     screen.fill('black')
     draw_board()
     draw_player()
     draw_misc()
-
+    draw_countdown()
     center_x = player_x + 23
     center_y = player_y + 24
     turns_allowed = check_position(center_x, center_y)
@@ -260,7 +307,7 @@ while run:
     if direction_command == 3 and turns_allowed[3]:
         direction = 3
     
-
+    # Skipping throgh the map
     if player_x > 900:
         player_x = -47
     elif player_x < -50:
