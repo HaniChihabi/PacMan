@@ -109,8 +109,66 @@ class Ghost:
         return ghost_rect
     
     def check_collisions(self):
+        num1 = (HEIGHT - 50) // 32    
+        num2 = (WIDTH // 30)
+        num3 = 15
         self.turns = [False, False, False, False]
-        self.in_box = True
+        if 0 < self.center_x // 30 < 29:
+            if level[self.center_y // num1][(self.center_x - num3) // num2] < 3 \
+                or (level[self.center_y // num1][(self.center_x - num3) // num2] == 9 and (self.in_box or self.dead)):
+                self.turns[1] = True
+            if level[self.center_y // num1][(self.center_x + num3) // num2] < 3 \
+                or (level[self.center_y // num1][(self.center_x + num3) // num2] == 9 and (self.in_box or self.dead)):
+                self.turns[0] = True
+            if level[(self.center_y + num3) // num2][self.center_x // num2] < 3 \
+                or (level[(self.center_y + num3) // num2][self.center_x // num2] == 9 and (self.in_box or self.dead)):
+                self.turns[3] = True
+            if level[(self.center_y - num3) // num2][self.center_x // num2] < 3 \
+                or (level[(self.center_y - num3) // num2][self.center_x // num2] == 9 and (self.in_box or self.dead)):
+                self.turns[2] = True
+
+            if self.direction == 2 or self.direction == 3:
+                if 12 <= self.center_x % num2 <= 18:
+                    if level[(self.center_y + num3) // num1][self.center_x// num2] < 3 \
+                        or (level[(self.center_y + num3) // num1][self.center_x// num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[3] = True
+                    if level[(self.center_y - num3) // num1][self.center_x// num2] < 3 \
+                        or (level[(self.center_y - num3) // num1][self.center_x// num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[2] = True
+                if 12 <= self.center_y % num1 <= 18:
+                    if level[self.center_y // num1][(self.center_x - num2) // num2] < 3 \
+                        or (level[self.center_y // num1][(self.center_x - num2) // num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[1] = True
+                    if level[self.center_y // num1][(self.center_x + num2) // num2] < 3 \
+                        or (level[self.center_y // num1][(self.center_x + num2) // num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[0] = True
+
+            if self.direction == 0 or self.direction == 1:
+                if 12 <= self.center_x % num2 <= 18:
+                    if level[(self.center_y + num1) // num1][self.center_x// num2] < 3 \
+                        or (level[(self.center_y + num1) // num1][self.center_x// num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[3] = True
+                    if level[(self.center_y - num1) // num1][self.center_x// num2] < 3 \
+                        or (level[(self.center_y - num1) // num1][self.center_x// num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[2] = True
+                if 12 <= self.center_y % num1 <= 18:
+                    if level[self.center_y // num1][(self.center_x - num3) // num2] < 3 \
+                        or (level[self.center_y // num1][(self.center_x - num3) // num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[1] = True
+                    if level[self.center_y // num1][(self.center_x + num3) // num2] < 3 \
+                        or (level[self.center_y // num1][(self.center_x + num3) // num2] == 9 and (self.in_box or self.dead)):
+                        self.turns[0] = True
+
+        else: 
+            self.turns[0] = True
+            self.turns[1] = True
+        if 350 < self.x_pos < 550 and 370 < self.y_pos < 490:
+            self.in_box = True
+        else:
+            self.in_box = False
+
+            self.turns = [False, False, False, False]
+            self.in_box = True
 
         return self.turns, self.in_box
 
@@ -119,14 +177,14 @@ def draw_countdown():
         screen.blit(numbers[numbers_counter // 60], (440, 915))
 
 def draw_misc():
-    # Blitting Information in at the bottom of the screen
+    # Blitting Information at the bottom of the screen
     score_text = font.render(f"Score: {score}", True, 'white')
 
     # Blitting score_text on bottom
     screen.blit(score_text, (10, 920))
 
     # Blitting score_text at the end on the middle
-    if score > 2620:
+    if score >= 2620:
         bigger_score_text = pygame.font.SysFont(None, 60) 
         bigger_score_text = bigger_score_text.render(f"Score: {score}", True, 'white')
         screen.blit(bigger_score_text, (360, 500))
@@ -228,19 +286,7 @@ def check_position(centerx, centery):
 
     # check collisions based on center x and center y of player +/- fudge number 
     if centerx // 30 < 29:
-        if direction == 0:
-            if level[centery // num1][(centerx - num3) // num2] < 3:
-                turns[1] = True
-        if direction == 1:
-            if level[centery // num1][(centerx + num3)// num2] < 3:
-                turns[0] = True
-        if direction == 2:
-            if level[(centery + num3) // num1][centerx // num2] < 3:
-                turns[3] = True
-        if direction == 3:
-            if level[(centery - num3) // num1][centerx // num2] < 3:
-                turns[2] = True
-
+       
         if direction == 2 or direction == 3:
             if 12 <= centerx % num2 <= 18:
                 if level[(centery + num3) // num1][centerx // num2] < 3:
