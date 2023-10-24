@@ -172,6 +172,42 @@ class Ghost:
 
         return self.turns, self.in_box
 
+    def move_clyde(self):
+        # R, L U D
+        # Clyde is going to turn whenever advantageous for pursuit
+        if self.direction == 0:
+            if self.target[0] > self.x_pos and self.turns[0]:
+                self.x_pos += self.speed
+            elif not self.turns[0]:
+                if self.target[1] > self.y_pos and self.turns[3]:
+                    self.direction = 3
+                    self.y_pos += self.speed
+                elif self.target[1] < self.y_pos and self.turns[2]:
+                    self.direction = 2
+                    self.y_pos += 1
+                elif self.target[0] < self.x_pos and self.turns[1]:
+                    self.direction = 0
+                    self.x_pos -= self.speed 
+                elif self.turns[3]:
+                    self.direction = 3
+                    self.y_pos += self.speed
+                elif self.turns[2]:
+                    self.direction = 2
+                    self.y_pos -= self.speed
+                elif self.turns[1]:
+                    self.direction = 1
+                    self.x_pos += self.speed
+            elif self.turns[0]:
+                if self.target[1] > self.y_pos and self.turns[3]:
+                    self.direction = 3
+                    self.y_pos += self.speed
+                if self.target[1] < self.y_pos and self.turns[2]:
+                    self.direction = 2
+                    self.y_pos -= self.speed
+                else:
+                    self.x_pos += self.speed
+
+
 def draw_countdown():
     if numbers:
         screen.blit(numbers[numbers_counter // 60], (440, 915))
@@ -197,6 +233,8 @@ def draw_misc():
         screen.blit(pygame.transform.scale(player_images[0], (30, 30)), (650 + i * 40, 915))
 
 def check_collisions(scor, power, power_count, eaten_ghosts):
+
+
    
     num1 = (HEIGHT - 50) // 32
     num2 = WIDTH//30
@@ -217,7 +255,6 @@ def check_collisions(scor, power, power_count, eaten_ghosts):
             eaten_ghosts = [False, False, False, False]
 
     return scor, power, power_count, eaten_ghosts
-    
 
 def draw_board():
    num1 = ((HEIGHT - 50) // 32)
@@ -286,7 +323,19 @@ def check_position(centerx, centery):
 
     # check collisions based on center x and center y of player +/- fudge number 
     if centerx // 30 < 29:
-       
+        if direction == 0:
+            if level[centery // num1][(centerx - num3) // num2] < 3:
+                turns[1] = True
+        if direction == 1:
+            if level[centery // num1][(centerx + num3) // num2] < 3:
+                turns[0] = True
+        if direction == 2:
+            if level[(centery + num3) // num1][centerx // num2] < 3:
+                turns[3] = True
+        if direction == 3:
+            if level[(centery - num3) // num1][centerx // num2] < 3:
+                turns[2] = True
+                
         if direction == 2 or direction == 3:
             if 12 <= centerx % num2 <= 18:
                 if level[(centery + num3) // num1][centerx // num2] < 3:
