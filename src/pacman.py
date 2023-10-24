@@ -428,7 +428,7 @@ def check_position(centerx, centery):
 
     # check collisions based on center x and center y of player +/- fudge number 
     if centerx // 30 < 29:
-        if direction == 0:
+       if direction == 0:
             if level[centery // num1][(centerx - num3) // num2] < 3:
                 turns[1] = True
         if direction == 1:
