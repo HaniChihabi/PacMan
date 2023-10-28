@@ -119,6 +119,8 @@ class Ghost:
         if 0 < self.center_x // 30 < 29:
             if level[(self.center_y - num3) // num1][self.center_x // num2] == 9:
                 self.turns[2] = True
+            if level[(self.center_y - num3) // num1][self.center_x // num2] == 9:
+                self.turns[2] = True
             if level[self.center_y // num1][(self.center_x - num3) // num2] < 3 or (level[self.center_y // num1][(self.center_x - num3) // num2] == 9 and (self.in_box or self.dead)):
                 self.turns[1] = True
             if level[self.center_y // num1][(self.center_x + num3) // num2] < 3 or (level[self.center_y // num1][(self.center_x + num3) // num2] == 9 and (self.in_box or self.dead)):
@@ -298,8 +300,9 @@ class Ghost:
         if self.x_pos < -30:
             self.x_pos = 900
         elif self.x_pos > 900:
-            self.x_pos - 30
+            self.x_pos = -30
         return self.x_pos, self.y_pos, self.direction
+
 def draw_countdown():
     if numbers:
         screen.blit(numbers[numbers_counter // 60], (440, 915))
@@ -470,6 +473,64 @@ def move_player(play_x, play_y):
             play_y += player_speed
         return play_x, play_y
 
+def get_targets(blink_x, blink_y, ink_x, ink_y, pink_x, pink_y, clyd_x, clyd_y):
+    if player_x < 450:
+        runaway_x = 900
+    else:
+        runaway_x = 0
+    if player_y < 450:
+        runaway_y = 900
+    else:
+        runaway_y = 0
+    return_target = (380, 400)
+    if powerup:
+        if not blinky.dead:
+            blink_target = (runaway_x, runaway_y)
+        else:
+            blink_target = return_target
+        if not inky.dead:
+            ink_target = (runaway_x, player_y)
+        else:
+            ink_target = return_target
+        if not pinky.dead:
+            pink_target = (player_x, runaway_y)
+        else:
+            pink_target = return_target
+        if not clyde.dead:
+            clyd_target = (450, 450)
+        else:
+            clyd_target = return_target
+    else:
+        if not blinky.dead:
+            if 340 < blink_x < 560 and 340 < blink_y < 500:
+                blink_target = (400, 100)
+            else:
+                blink_target = (player_x, player_y)
+        else:
+            blink_target = return_target
+        if not inky.dead:
+            if 340 < ink_x < 560 and 340 < ink_y < 500:
+                ink_target = (400, 100)
+            else:
+                ink_target = (player_x, player_y)
+        else:
+            ink_target = return_target
+        if not pinky.dead:
+            if 340 < pink_x < 560 and 340 < pink_y < 500:
+                pink_target = (400, 100)
+            else:
+                pink_target = (player_x, player_y)
+        else:
+            pink_target = return_target
+        if not clyde.dead:
+            if 340 < clyd_x < 560 and 340 < clyd_y < 500:
+                clyd_target = (400, 100)
+            else:
+                clyd_target = (player_x, player_y)
+        else:
+            clyd_target = return_target
+    return [blink_target, ink_target, pink_target, clyd_target]
+
 # Time + flicking of big dot
 run = True
 while run:
@@ -509,6 +570,7 @@ while run:
     pinky = Ghost(pinky_x, pinky_y, targets[0], ghost_speed, pinky_img, pinky_direction, pinky_dead, pinky_box, 0)
     clyde = Ghost(clyde_x, clyde_y, targets[0], ghost_speed, clyde_img, clyde_direction, clyde_dead, clyde_box, 0)
     draw_player()
+    targets = get_targets(blinky_x, blinky_y, inky_y, inky_y, pinky_x, pinky_y, clyde_x, clyde_y)
     draw_misc()
     draw_countdown()
     center_x = player_x + 23
@@ -573,3 +635,9 @@ while run:
 
     pygame.display.flip()
 pygame.quit()
+
+# get ghosts moving through ghost door
+# lose a life and reset on collision with ghost
+# eat ghost and send running back to cage if powerup
+# create 3 extra movement algorithms
+# sound effects, restart and winning messages
