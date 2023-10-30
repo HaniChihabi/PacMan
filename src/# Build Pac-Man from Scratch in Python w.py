@@ -1096,7 +1096,7 @@ while run:
             powerup = False
             power_counter = 0
             lives -= 1
-            startup_counter = 0
+            startup_counter = 0 #
             player_x = 450
             player_y = 663
             direction = 0
